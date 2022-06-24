@@ -1,0 +1,76 @@
+## IDE files
+#*users*
+.idea/
+*.user
+*.swp
+*~
+
+# Visual Studio
+.vs/
+#*.sln
+#*.vcxproj*
+x86/
+x64/
+Debug/
+Release/
+
+# VS Code
+.vscode/*
+#!.vscode/tasks.json
+#!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/extensions.json
+#*.code-workspace
+
+
+## Artifacts
+# Folders:
+mid/
+out/
+libs/
+links/
+build/
+cmake-win/
+cmake-nix/
+cmake-build-*/
+
+# Files:
+*.[ao]
+*.exe
+*.pdb
+*.ilk
+*.log
+*.ini
+
+
+## Other/Temp/Note
+temp/
+cmd.sh
+cmd.bat
+cmd.wsf
+flow.sh
+flow.txt
+notes.txt
+
+
+## Windows/Linux/other file copys/duplicates or '_commented' file (dummys)
+_*
+*.[1-9]
+*([1-9])*
+*— копия*
+*— copy*
+* copy*
+
+
+## OS Generated Files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.Trash-*
+$RECYCLE.BIN/
+.TemporaryItems
+ehthumbs.db
+Thumbs.db
