@@ -1,0 +1,33 @@
+### EditorConfig is awesome: https://EditorConfig.org
+root = true # top-most EditorConfig file
+
+## General: Unix-style newlines with a newline ending every file
+[*]
+indent_style = tab
+indent_size = 4
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+
+## Mandatory tab indentation files
+[{Makefile}]
+indent_style = tab
+#charset = utf-8 # set default charset
+
+
+## Mandatory tab indentation extensions
+[*.{py,js}]
+indent_style = tab
+
+
+## Indent: 2
+# Matches the exact files; Style: space
+[{CMakeLists.txt,*.cmake,.clang-format}]
+indent_style = space
+indent_size = 2
+
+# Matches the exact file extensions
+[*.{xml,yml}]
+#indent_style = space
+indent_size = 2
