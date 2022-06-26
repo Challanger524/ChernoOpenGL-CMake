@@ -29,5 +29,9 @@ set(GLFW_BUILD_TESTS    NO CACHE BOOL "" FORCE)
 set(GLFW_BUILD_DOCS     NO CACHE BOOL "" FORCE)
 add_subdirectory("deps/glfw")
 
+set(ONLY_LIBS               ON CACHE BOOL "" FORCE)
+set(glew-cmake_BUILD_SHARED NO CACHE BOOL "" FORCE)
+add_subdirectory("deps/glew-cmake")
+
 # Apply dependencies
-target_link_libraries(${PROJECT_NAME} OpenGL::GL glfw)
+target_link_libraries(${PROJECT_NAME} OpenGL::GL glfw libglew_static)
