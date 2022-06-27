@@ -26,3 +26,6 @@ add_subdirectory("Dependencies/glew-cmake")
 
 # Apply dependencies
 target_link_libraries(${PROJECT_NAME} OpenGL::GL glfw libglew_static)
+
+# Deal with resource dependencies (of the executable)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}) # Not the best practice, but it works for now
