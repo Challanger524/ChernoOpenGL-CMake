@@ -4,3 +4,6 @@
 [submodule "Dependencies/glew-cmake"]
 	path = Dependencies/glew-cmake
 	url = https://github.com/Perlmint/glew-cmake
+[submodule "Dependencies/glbinding"]
+	path = Dependencies/glbinding
+	url = https://github.com/cginternals/glbinding

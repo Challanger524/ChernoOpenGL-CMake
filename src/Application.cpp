@@ -1,5 +1,11 @@
-#include <GL/glew.h>
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <glbinding/gl/gl.h>
+#include <glbinding/glbinding.h>
+
+#include <glbinding/Version.h>
+#include <glbinding-aux/Meta.h> // optional auxiliary (glbinding) lib
+#include <glbinding-aux/types_to_string.h>
 
 #include <iostream>
 #include <fstream>
@@ -11,6 +17,8 @@
 #if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 #include <signal.h>
 #endif
+
+using namespace gl;
 
 #ifdef WIN32 // debug-breakpoint/platform-specific
 #define BREAKPOINT() __debugbreak()
@@ -103,14 +111,14 @@ static ShaderProgramSource ParseShader(const std::filesystem::path &filePath)
 	return { ss[0].str(), ss[1].str() };
 }
 
-static unsigned int CompileShader(unsigned int type, const std::string &source)
+static unsigned int CompileShader(GLenum type, const std::string &source)
 {
 	unsigned int shader = glCreateShader(type);
 	const char *src = source.c_str();
 	glShaderSource(shader, 1, &src, nullptr);
 	glCompileShader(shader);
 
-	int result;
+	GLboolean result;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
 	if (result == GL_FALSE)
 	{
@@ -172,18 +180,33 @@ int main(void)
 
 	glfwSwapInterval(1);
 
-	if (GLenum err = glewInit(); err != GLEW_OK)
-		std::cerr << "Error: glewInit(): " << glewGetErrorString(err) << std::endl;
+	glbinding::initialize(glfwGetProcAddress);
 
 	// Enable OpenGL features
 	glEnable(GL_DEBUG_OUTPUT);
 	if (glIsEnabled(GL_DEBUG_OUTPUT) == GL_TRUE) // attemt to validate if gl-feature works
 		glDebugMessageCallback(GlDebugMessage_cb, nullptr);
 
+#if 1 // glbinding::AfterCallback vs GLCall(x) macro with breakpoint
+	glbinding::setCallbackMaskExcept(glbinding::CallbackMask::After, { "glGetError" });
+	glbinding::setAfterCallback([](const glbinding::FunctionCall &)
+								{
+									auto error = glGetError();
+									while (error != GL_NO_ERROR)
+									{
+										std::cout << "Error(0x" << std::hex << "): " << static_cast<unsigned>(error) << std::endl;
+										auto error = glGetError();
+									}
+								});
+#endif
+
 	std::cout << "Info: Vendor      : " << glGetString(GL_VENDOR) << std::endl;
 	std::cout << "Info: Renderer    : " << glGetString(GL_RENDERER) << std::endl;
-	std::cout << "Info: GLEW version: " << glewGetString(GLEW_VERSION) << std::endl;
 	std::cout << "Info: GL   version: " << glGetString(GL_VERSION) << std::endl;
+	std::cout << "Info: glbinding meta versions: ";
+	for (const glbinding::Version &ver : glbinding::aux::Meta::versions())
+		std::cout << ver << '|';
+	std::cout << std::endl;
 
 	float positions[] = { // pos[x,y...]
 		-0.5f, -0.5f, // 0
