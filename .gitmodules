@@ -4,3 +4,6 @@
 [submodule "glew-cmake"]
 	path = deps/glew-cmake
 	url = https://github.com/Perlmint/glew-cmake
+[submodule "stb"]
+	path = deps/stb/stb
+	url = https://github.com/nothings/stb
