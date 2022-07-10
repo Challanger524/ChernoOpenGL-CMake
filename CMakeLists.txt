@@ -36,3 +36,7 @@ add_subdirectory("deps/glew-cmake")
 
 # Apply dependencies
 target_link_libraries(${PROJECT_NAME} OpenGL::GL glfw libglew_static)
+
+target_include_directories(${PROJECT_NAME} PRIVATE SYSTEM
+  "${CMAKE_SOURCE_DIR}/deps/stb"
+)
