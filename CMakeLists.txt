@@ -34,8 +34,10 @@ set(glew-cmake_BUILD_SHARED NO CACHE BOOL "" FORCE)
 add_definitions(-DGLEW_STATIC)
 add_subdirectory("Dependencies/glew-cmake")
 
+add_subdirectory("Dependencies/glm")
+
 # Apply dependencies
-target_link_libraries(${PROJECT_NAME} OpenGL::GL glfw libglew_static)
+target_link_libraries(${PROJECT_NAME} OpenGL::GL glfw libglew_static glm::glm)
 
 target_include_directories(${PROJECT_NAME} PRIVATE SYSTEM
   "${CMAKE_SOURCE_DIR}/Dependencies/stb"
