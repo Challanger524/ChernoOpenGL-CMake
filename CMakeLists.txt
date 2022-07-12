@@ -36,9 +36,22 @@ add_subdirectory("deps/glew-cmake")
 
 add_subdirectory("deps/glm")
 
+# Setup ImGui library
+# P.S. As you see - the most ugly CMake dependency.
+# Also I didn't want to include ImGui source folder directly, but the lib's architecture sucks so much.
+set(_IMGUI_PATH "${CMAKE_SOURCE_DIR}/deps/imgui/imgui")
+file(GLOB _IMGUI_SOURCE_FILES    "${_IMGUI_PATH}/*.cpp")
+set(_IMGUI_BACKENDS_SOURCE_FILES "${_IMGUI_PATH}/backends/imgui_impl_glfw.cpp" #:2 api-dependend includes!
+                                 "${_IMGUI_PATH}/backends/imgui_impl_opengl3.cpp")
+add_library(imgui STATIC ${_IMGUI_SOURCE_FILES} ${_IMGUI_BACKENDS_SOURCE_FILES})
+target_include_directories(imgui PRIVATE "${_IMGUI_PATH}" "${CMAKE_SOURCE_DIR}/deps/glfw/include")
+set_target_properties(imgui PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON)
+
+
 # Apply dependencies
-target_link_libraries(${PROJECT_NAME} OpenGL::GL glfw libglew_static glm::glm)
+target_link_libraries(${PROJECT_NAME} OpenGL::GL glfw libglew_static glm::glm imgui)
 
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
   "${CMAKE_SOURCE_DIR}/deps/stb"
+  "${CMAKE_SOURCE_DIR}/deps/imgui" "${_IMGUI_PATH}"
 )
