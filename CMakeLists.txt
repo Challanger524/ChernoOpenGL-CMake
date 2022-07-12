@@ -35,8 +35,18 @@ add_subdirectory("deps/glew-cmake")
 
 add_subdirectory("deps/glm")
 
+## Setup ImGui library
+set(IMGUI_SOURCE_DIR_ "${CMAKE_SOURCE_DIR}/deps/imgui")
+set(IMGUI_BACKENDS_SOURCE_FILES_ "${IMGUI_SOURCE_DIR_}/backends/imgui_impl_glfw.cpp" # :2 api-dependend includes!
+                                 "${IMGUI_SOURCE_DIR_}/backends/imgui_impl_opengl3.cpp")
+file(GLOB IMGUI_SOURCE_FILES_    "${IMGUI_SOURCE_DIR_}/*.cpp")
+add_library               (imgui STATIC ${IMGUI_SOURCE_FILES_} ${IMGUI_BACKENDS_SOURCE_FILES_})
+target_include_directories(imgui SYSTEM PUBLIC  "${IMGUI_SOURCE_DIR_}"
+                                        PRIVATE "${CMAKE_SOURCE_DIR}/deps/glfw/include")
+set_target_properties     (imgui PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON)
+
 # Apply dependencies
-target_link_libraries     (${PROJECT_NAME} OpenGL::GL glfw libglew_static glm::glm)
+target_link_libraries     (${PROJECT_NAME} OpenGL::GL glfw libglew_static glm::glm imgui)
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
   "${CMAKE_SOURCE_DIR}/deps"
 )
