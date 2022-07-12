@@ -28,7 +28,7 @@ int main(void)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow *window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+	GLFWwindow *window = glfwCreateWindow(960, 540, "Hello World", NULL, NULL);
 	if (!window)
 	{ glfwTerminate(); return -1; }
 
@@ -54,10 +54,10 @@ int main(void)
 
 	{ // Vertex-/Index-Buffer scope
 		float positions[] = { // pos[x,y...]
-			-0.5f, -0.5f, 0.0f, 0.0f, // 0
-			 0.5f, -0.5f, 1.0f, 0.0f, // 1
-			 0.5f,  0.5f, 1.0f, 1.0f, // 2
-			-0.5f,  0.5f, 0.0f, 1.0f, // 3
+			100.0f, 100.0f, 0.0f, 0.0f, // 0
+			200.0f, 100.0f, 1.0f, 0.0f, // 1
+			200.0f, 200.0f, 1.0f, 1.0f, // 2
+			100.0f, 200.0f, 0.0f, 1.0f, // 3
 		};
 
 		unsigned int indices[] = { // trig[v1,v2,v3...]
@@ -76,7 +76,8 @@ int main(void)
 
 		IndexBuffer ib(indices, 6);
 
-		glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f);
+		glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 720.0f);
+		glm::vec4 vertex_pos(100.0f, 100.0f, 0.0f, 1.0f);
 
 		Texture texture("res/textures/ChernoLogo.png");
 		texture.Bind(0);
