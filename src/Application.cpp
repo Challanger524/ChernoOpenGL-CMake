@@ -11,6 +11,9 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
 
 #include <iostream>
 #include <type_traits>
@@ -69,12 +72,29 @@ int main(void)
 
 	std::cout << std::endl;
 
+	// Init ImGui (graphical user interface for C++)
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO &io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init(nullptr);
+
 	std::cout << "Info: GLFW version: " << glfwGetVersionString() << std::endl;
 	std::cout << "Info: GLEW version: " << glewGetString(GLEW_VERSION) << std::endl;
 	std::cout << "Info: GL   version: " << glGetString(GL_VERSION) << std::endl;
 	std::cout << "Info: GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 	std::cout << "Info: GPU  vendor : " << glGetString(GL_VENDOR) << std::endl;
 	std::cout << "Info: Renderer    : " << glGetString(GL_RENDERER) << std::endl;
+	std::cout << "Info: ImGui version: " << IMGUI_VERSION;
+#ifdef IMGUI_HAS_DOCK
+	std::cout << " +docking";
+#endif
+#ifdef IMGUI_HAS_VIEWPORT
+	std::cout << " +viewport";
+#endif
+	std::cout << std::endl << std::endl;
 
 	{ // Vertex-/Index-Buffer scope
 		float positions[] = { // pos[x,y...]
@@ -101,10 +121,7 @@ int main(void)
 		IndexBuffer ib(indices, 6);
 
 		glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 720.0f);
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200, 200, 0)); // move model to the up-right
 		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(100, 0, 0)); // move camera to the left (world to the right)
-
-		glm::mat4 mvp = proj * model * view;
 
 		Texture texture("res/textures/ChernoLogo.png");
 		texture.Bind(0);
@@ -112,7 +129,6 @@ int main(void)
 		Shader shader("res/shaders/Basic.shader");
 		shader.Bind();
 		shader.SetUniform1i("u_Texture", 0);
-		shader.SetUniformMat4f("u_MVP", mvp);
 
 		va.Unbind();
 		vb.Unbind();
@@ -121,13 +137,41 @@ int main(void)
 
 		Renderer renderer;
 
+		glm::vec3 translation(200, 200, 0);
+		bool show_demo_window = false;
 		while (!glfwWindowShouldClose(window))
 		{
 			renderer.Clear();
 
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
+			glm::mat4 mvp = proj * model * view;
+
 			shader.Bind();
+			shader.SetUniformMat4f("u_MVP", mvp);
 
 			renderer.Draw(va, ib, shader);
+
+			{ // Show a simple window that we create ourselves (use a Begin/End pair to created a named window)
+				ImGui::Checkbox("Demo Window", &show_demo_window);
+				ImGui::SliderFloat2("Translation", &translation.x, 0.0f, 960.0f);
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			}
+
+			if (show_demo_window) // Show the big demo window (documentation active samples)
+				ImGui::ShowDemoWindow(&show_demo_window);
+
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
+				ImGui::UpdatePlatformWindows();
+				ImGui::RenderPlatformWindowsDefault();
+				glfwMakeContextCurrent(window);
+			}
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -136,5 +180,10 @@ int main(void)
 
 	} // Vertex-/Index-Buffer scope
 
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
+	glfwDestroyWindow(window);
 	glfwTerminate();
 }
