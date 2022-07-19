@@ -7,6 +7,8 @@
 #include "Renderer.hpp"
 #include "Texture.hpp"
 
+#include "tests/Test-ClearColor.hpp"
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -96,77 +98,24 @@ int main()
 	std::cout << std::endl << std::endl;
 
 	{ // Vertex-/Index-Buffer scope
-		float positions[] = { // pos[x,y...]
-			-50.0f, -50.0f, 0.0f, 0.0f, // 0
-			 50.0f, -50.0f, 1.0f, 0.0f, // 1
-			 50.0f,  50.0f, 1.0f, 1.0f, // 2
-			-50.0f,  50.0f, 0.0f, 1.0f, // 3
-		};
-
-		unsigned int indices[] = { // trig[v1,v2,v3...]
-			0, 1, 2,
-			2, 3, 0
-		};
-
-		static_assert(sizeof(float) == sizeof(std::remove_extent_t<decltype(positions)>));
-		VertexBuffer vb(positions, 4 * 4 * sizeof(std::remove_extent_t<decltype(positions)>));
-		VertexArray va;
-		VertexBufferLayout layout;
-
-		layout.Push<float>(2);
-		layout.Push<float>(2);
-		va.AddBuffer(vb, layout);
-
-		IndexBuffer ib(indices, 6);
-
-		glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 720.0f);
-		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-
-		Texture texture("res/textures/ChernoLogo.png");
-		texture.Bind(0);
-
-		Shader shader("res/shaders/Basic.shader");
-		shader.Bind();
-		shader.SetUniform1i("u_Texture", 0);
-
-		va.Unbind();
-		vb.Unbind();
-		ib.Unbind();
-		shader.Unbind();
-
 		Renderer renderer;
+		test::TestClearColor test;
 
-		glm::vec3 translationA(200, 200, 0);
-		glm::vec3 translationB(400, 200, 0);
 		bool show_demo_window = false;
 		while (!glfwWindowShouldClose(window))
 		{
 			renderer.Clear();
 
+			test.OnUpdate();
+			test.OnRender();
+
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
 
-			{	// draw 1st object
-				glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
-				glm::mat4 mvp = proj * model * view;
-				shader.Bind();
-				shader.SetUniformMat4f("u_MVP", mvp);
-				renderer.Draw(va, ib, shader);
-			}
-
-			{	// draw 2nd object
-				glm::mat4 model = glm::translate(glm::mat4(1.0f), translationB);
-				glm::mat4 mvp = proj * model * view;
-				shader.Bind();
-				shader.SetUniformMat4f("u_MVP", mvp);
-				renderer.Draw(va, ib, shader);
-			}
-
 			{ // Show a simple window that we create ourselves (use a Begin/End pair to created a named window)
 				ImGui::Checkbox("Demo Window", &show_demo_window);
-				ImGui::SliderFloat2("Translation A", &translationA.x, 0.0f, 960.0f);
-				ImGui::SliderFloat2("Translation B", &translationB.x, 0.0f, 960.0f);
+				test.OnImGuiRender();
 				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			}
 
