@@ -7,6 +7,7 @@
 #include "Renderer.hpp"
 #include "Texture.hpp"
 
+#include "tests/Test.hpp"
 #include "tests/Test-ClearColor.hpp"
 
 #include <GL/glew.h>
@@ -78,23 +79,39 @@ int main(void)
 
 	{ // Vertex-/Index-Buffer scope
 		Renderer renderer;
-		test::TestClearColor test;
+
+		test::Test *currentTest = nullptr;
+		test::TestMenu *testMenu = new test::TestMenu(currentTest);
+		currentTest = testMenu;
+
+		testMenu->RegisterTest<test::TestClearColor>("Clear Color");
 
 		bool show_demo_window = false;
 		while (!glfwWindowShouldClose(window))
 		{
+			GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 			renderer.Clear();
-
-			test.OnUpdate();
-			test.OnRender();
 
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
 
+			if (currentTest)
+			{
+				currentTest->OnUpdate();
+				currentTest->OnRender();
+				ImGui::Begin("Test");
+				if (currentTest != testMenu && ImGui::Button("<-"))
+				{ // return to menu
+					delete currentTest;
+					currentTest = testMenu;
+				}
+				currentTest->OnImGuiRender();
+				ImGui::End();
+			}
+
 			{ // Show a simple window that we create ourselves (use a Begin/End pair to created a named window)
 				ImGui::Checkbox("Demo Window", &show_demo_window);
-				test.OnImGuiRender();
 				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			}
 
@@ -115,7 +132,12 @@ int main(void)
 
 		} // while (!glfwWindowShouldClose(window))
 
+		delete currentTest;
+		if (currentTest != testMenu)
+			delete testMenu;
+
 	} // Vertex-/Index-Buffer scope
+
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
