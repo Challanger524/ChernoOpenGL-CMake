@@ -4,6 +4,7 @@
 #include "tests/Test.hpp"
 #include "tests/Test-ClearColor.hpp"
 #include "tests/Test-Texture2D.hpp"
+#include "tests/Test-Batching.hpp"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -103,6 +104,7 @@ int main(void)
 
 		testMenu->RegisterTest<test::TestClearColor>("Clear Color");
 		testMenu->RegisterTest<test::TestTexture2D>("Texture 2D");
+		testMenu->RegisterTest<test::Batching>("Batching");
 
 		bool show_demo_window = false;
 		while (!glfwWindowShouldClose(window))
