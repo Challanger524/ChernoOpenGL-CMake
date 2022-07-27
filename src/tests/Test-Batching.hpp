@@ -37,11 +37,11 @@ public:
 	Batching()
 	{
 		// object 1
-		std::vector<float> positions1 = { // pos[x,y...]
-			100.0f, 100.0f, // 0
-			200.0f, 100.0f, // 1
-			200.0f, 200.0f, // 2
-			100.0f, 200.0f, // 3
+		std::vector<float> positions1 = { // pos[x,y], color[r,g,b,a], ...
+			100.0f, 100.0f, 0.18f, 0.6f, 0.96f, 1.0f, // 0
+			200.0f, 100.0f, 0.18f, 0.6f, 0.96f, 1.0f, // 1
+			200.0f, 200.0f, 0.18f, 0.6f, 0.96f, 1.0f, // 2
+			100.0f, 200.0f, 0.18f, 0.6f, 0.96f, 1.0f  // 3
 		};
 		std::vector<unsigned int> indices1 = { // trig[v1,v2,v3...]
 			0, 1, 2,
@@ -50,10 +50,10 @@ public:
 
 		// object 2
 		std::vector<float> positions2 = {
-			300.0f, 100.0f, // 4
-			400.0f, 100.0f, // 5
-			400.0f, 200.0f, // 6
-			300.0f, 200.0f, // 7
+			300.0f, 100.0f, 1.0f, 0.93f, 0.24f, 1.0f, // 4
+			400.0f, 100.0f, 1.0f, 0.93f, 0.24f, 1.0f, // 5
+			400.0f, 200.0f, 1.0f, 0.93f, 0.24f, 1.0f, // 6
+			300.0f, 200.0f, 1.0f, 0.93f, 0.24f, 1.0f  // 7
 		};
 		std::vector<unsigned int> indices2 = { // must be shifted to not to corelate with `indices1`
 			0, 1, 2, // 4, 5, 6
@@ -61,6 +61,7 @@ public:
 		};
 
 		constexpr auto coord_count = 2u; // xy
+		constexpr auto color_count = 4u; // rgba
 
 		// batcheding the objects
 		std::vector<float> batched_positions;
@@ -71,7 +72,7 @@ public:
 		std::vector<unsigned int> batched_indices(indices1); // copy 1st buff
 		std::transform(indices2.begin(), indices2.end(), // append-shift 2nd buff
 					   std::back_inserter(batched_indices),
-					   [&](const auto &val) { return unsigned(val + positions1.size() / coord_count); });
+					   [&](const auto &val) { return unsigned(val + positions1.size() / (coord_count + color_count)); });
 
 		m_vao = std::make_unique<VertexArray>();
 
@@ -80,6 +81,7 @@ public:
 
 		VertexBufferLayout layout;
 		layout.Push<float>(2); // coord xy
+		layout.Push<float>(4); // color rgb
 		m_vao->AddBuffer(*m_vertexBuffer, layout);
 
 		m_indexBuffer = std::make_unique<IndexBuffer>(batched_indices.data(), unsigned(batched_indices.size()));
