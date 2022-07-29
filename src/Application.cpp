@@ -6,6 +6,7 @@
 #include "tests/Test-Texture2D.hpp"
 #include "tests/Test-Batching.hpp"
 #include "tests/Test-Batching-Textures.hpp"
+#include "tests/Test-Batching-Textures-dynamic.hpp"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -83,6 +84,7 @@ int main(void)
 		testMenu->RegisterTest<test::TestTexture2D>("Texture 2D");
 		testMenu->RegisterTest<test::Batching>("Batching");
 		testMenu->RegisterTest<test::BatchingTextures>("Batching Textures");
+		testMenu->RegisterTest<test::BatchingTexturesDynamic>("Batching Textures (dynamic)");
 
 		bool show_demo_window = false;
 		while (!glfwWindowShouldClose(window))
